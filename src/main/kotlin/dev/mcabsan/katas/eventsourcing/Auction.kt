@@ -8,6 +8,7 @@ class Auction private constructor(
     var itemDescription: String,
     var initialPrice: Int,
     var currentBid: Int = 0,
+    var closed: Boolean = false,
     val changes: MutableList<BaseEvent> = mutableListOf()
 ) {
     fun makeBid(amount: Int) {
@@ -17,10 +18,18 @@ class Auction private constructor(
         applyEvent(event)
     }
 
+    fun close() {
+        val event = AuctionClosed(id, Instant.now())
+        changes.add(event)
+
+        applyEvent(event)
+    }
+
     private fun applyEvent(event: BaseEvent) {
         when (event) {
             is AuctionCreated -> apply(event)
             is AuctionNewBid -> apply(event)
+            is AuctionClosed -> apply(event)
         }
     }
 
@@ -32,6 +41,10 @@ class Auction private constructor(
 
     private fun apply(event: AuctionNewBid) {
         this.currentBid = event.amount
+    }
+
+    private fun apply(event: AuctionClosed) {
+        this.closed = true
     }
 
     companion object {

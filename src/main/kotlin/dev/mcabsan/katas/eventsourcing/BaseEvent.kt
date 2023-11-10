@@ -19,3 +19,8 @@ data class AuctionNewBid(
     override val occurredAt: Instant,
     val amount: Int
 ) : BaseEvent
+
+data class AuctionClosed(
+    override val id: String,
+    override val occurredAt: Instant
+) : BaseEvent

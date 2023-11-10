@@ -30,4 +30,19 @@ internal class EventSourcingKataTest {
 
         assertThat(actual.currentBid).isEqualTo(30000)
     }
+
+    @Test
+    fun `should close an auction`() {
+        val auction = Auction.create("Mario Bros NES", 10000)
+
+        auction.makeBid(20000)
+        auction.makeBid(30000)
+
+        auction.close()
+
+        repository.save(auction)
+        val actual = repository.getById(auction.id)
+
+        assertThat(actual.closed).isTrue
+    }
 }
