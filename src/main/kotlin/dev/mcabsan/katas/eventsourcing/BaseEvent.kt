@@ -13,3 +13,9 @@ data class AuctionCreated(
     val itemDescription: String,
     val initialPrice: Int
 ) : BaseEvent
+
+data class AuctionNewBid(
+    override val id: String,
+    override val occurredAt: Instant,
+    val amount: Int
+) : BaseEvent
