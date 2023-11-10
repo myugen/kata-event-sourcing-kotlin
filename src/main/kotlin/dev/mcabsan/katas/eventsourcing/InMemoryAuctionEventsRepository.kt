@@ -7,8 +7,15 @@ class InMemoryAuctionEventsRepository(
         eventsStore[auction.id] = auction.changes
     }
 
-    fun getById(id: String): Auction {
+    fun getById(id: String): Auction = Auction.loadFromHistory(aggregateEvents(id))
+
+    private fun aggregateEvents(id: String): List<DomainEvent> {
         val events = eventsStore[id] ?: emptyList()
-        return Auction.loadFromHistory(events)
+        return events.map {
+            when (it) {
+                is DomainEvent -> it
+                is DeprecatedEvent -> it.toLatestVersion()
+            }
+        }
     }
 }

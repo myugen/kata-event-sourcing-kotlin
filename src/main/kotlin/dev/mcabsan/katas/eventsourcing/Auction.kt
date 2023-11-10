@@ -26,10 +26,9 @@ class Auction private constructor(
         applyEvent(event)
     }
 
-    private fun applyEvent(event: BaseEvent) {
+    private fun applyEvent(event: DomainEvent) {
         when (event) {
             is AuctionCreated -> apply(event)
-            is AuctionNewBid -> apply(event)
             is AuctionNewBidV2 -> apply(event)
             is AuctionClosed -> apply(event)
         }
@@ -39,10 +38,6 @@ class Auction private constructor(
         this.id = event.id
         this.itemDescription = event.itemDescription
         this.initialPrice = event.initialPrice
-    }
-
-    private fun apply(event: AuctionNewBid) {
-        this.currentBid = event.amount
     }
 
     private fun apply(event: AuctionNewBidV2) {
@@ -56,7 +51,7 @@ class Auction private constructor(
 
     companion object {
         private fun empty(): Auction = Auction("", "", 0)
-        fun loadFromHistory(events: List<BaseEvent>): Auction = empty()
+        fun loadFromHistory(events: List<DomainEvent>): Auction = empty()
             .apply { events.forEach(this::applyEvent) }
 
         fun create(itemDescription: String, initialPrice: Int): Auction {
