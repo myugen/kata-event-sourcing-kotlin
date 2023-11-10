@@ -8,11 +8,12 @@ class Auction private constructor(
     var itemDescription: String,
     var initialPrice: Int,
     var currentBid: Int = 0,
+    var currentBidder: String = "",
     var closed: Boolean = false,
     val changes: MutableList<BaseEvent> = mutableListOf()
 ) {
-    fun makeBid(amount: Int) {
-        val event = AuctionNewBid(id, Instant.now(), amount)
+    fun makeBid(amount: Int, bidder: String) {
+        val event = AuctionNewBidV2(id, Instant.now(), amount, bidder)
         changes.add(event)
 
         applyEvent(event)
@@ -29,6 +30,7 @@ class Auction private constructor(
         when (event) {
             is AuctionCreated -> apply(event)
             is AuctionNewBid -> apply(event)
+            is AuctionNewBidV2 -> apply(event)
             is AuctionClosed -> apply(event)
         }
     }
@@ -43,6 +45,11 @@ class Auction private constructor(
         this.currentBid = event.amount
     }
 
+    private fun apply(event: AuctionNewBidV2) {
+        this.currentBid = event.amount
+        this.currentBidder = event.bidder
+    }
+
     private fun apply(event: AuctionClosed) {
         this.closed = true
     }
@@ -51,6 +58,7 @@ class Auction private constructor(
         private fun empty(): Auction = Auction("", "", 0)
         fun loadFromHistory(events: List<BaseEvent>): Auction = empty()
             .apply { events.forEach(this::applyEvent) }
+
         fun create(itemDescription: String, initialPrice: Int): Auction {
             val id = UUID.randomUUID().toString()
             val eventOccurredAt = Instant.now()

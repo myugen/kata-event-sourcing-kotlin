@@ -20,6 +20,13 @@ data class AuctionNewBid(
     val amount: Int
 ) : BaseEvent
 
+data class AuctionNewBidV2(
+    override val id: String,
+    override val occurredAt: Instant,
+    val amount: Int,
+    val bidder: String
+) : BaseEvent
+
 data class AuctionClosed(
     override val id: String,
     override val occurredAt: Instant
